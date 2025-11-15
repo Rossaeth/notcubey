@@ -1,10 +1,8 @@
-// config/miniapp.ts
+// config/minikitConfig.ts
 
 const ROOT_URL: string =
   process.env.NEXT_PUBLIC_URL ||
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : 'http://localhost:3000');
+  "https://notcubey.vercel.app";
 
 export const minikitConfig = {
   accountAssociation: {
@@ -15,23 +13,23 @@ export const minikitConfig = {
   baseBuilder: {
     ownerAddress: "0x5be8F2CEA3fa9206e7D3276a7c1C35106809f594"
   },
-  miniapp: {
-    version: "1",
-    name: "fid ai",
-    subtitle: "Your AI Ad Companion",
-    description: "Ads",
-    screenshotUrls: [`${ROOT_URL}/screenshot-portrait.png`],
-    iconUrl: `${ROOT_URL}/blue-icon.png`,
-    splashImageUrl: `${ROOT_URL}/blue-hero.png`,
-    splashBackgroundColor: "#000000",
-    homeUrl: ROOT_URL,
-    webhookUrl: `${ROOT_URL}/api/webhook`,
-    primaryCategory: "social",
-    tags: ["marketing", "ads", "quickstart", "waitlist"],
-    heroImageUrl: `${ROOT_URL}/blue-hero.png`,
-    tagline: "AI-powered marketing assistant",
-    ogTitle: "Cubey - Your AI Ad Companion",
-    ogDescription: "Create smarter ads with Cubey MiniApp",
-    ogImageUrl: `${ROOT_URL}/blue-hero.png`
-  }
-} as const; 
+miniapp: {
+  version: "1",
+  name: "math-quick",
+  subtitle: "Fast Math Puzzle Game",
+  description: "Test your math speed and reflexes!",
+  screenshotUrls: [`${ROOT_URL}/screenshot-portrait.png`],
+  iconUrl: `${ROOT_URL}/game-icon.png`,
+  splashImageUrl: `${ROOT_URL}/game-hero.png`,
+  splashBackgroundColor: "#000000",
+  homeUrl: ROOT_URL,
+  webhookUrl: `${ROOT_URL}/api/webhook`,
+  primaryCategory: "games",
+  tags: ["game", "math", "puzzle", "quick", "miniapp"],
+  heroImageUrl: `${ROOT_URL}/game-hero.png`,
+  tagline: "Improve your brain speed with fun math challenges!",
+  ogTitle: "Math Quick Game",
+  ogDescription: "Test your brain speed with fast math puzzles.",
+  ogImageUrl: `${ROOT_URL}/game-hero.png`
+}  
+} as const;
