@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useMiniKit } from "@coinbase/onchainkit/minikit";
+import { useEffect, useState } from "react";
+import { sdk } from "@farcaster/miniapp-sdk";
 import styles from "./page.module.css";
 
 export default function Home() {
-  const { context } = useMiniKit();
-
+  const [ready, setReady] = useState(false);
   const [num1, setNum1] = useState(0);
   const [num2, setNum2] = useState(0);
   const [answer, setAnswer] = useState("");
@@ -21,32 +20,44 @@ export default function Home() {
     setAnswer("");
   };
 
-  // Start game on load
+  // Init MiniApp & start game
   useEffect(() => {
-    newQuestion();
+    const init = async () => {
+      try {
+        await sdk.actions.ready();
+        setReady(true);
+        newQuestion();
+      } catch (err) {
+        console.error("MiniApp SDK error:", err);
+      }
+    };
+    init();
   }, []);
 
   // Countdown timer
   useEffect(() => {
-    if (timeLeft <= 0) {
-      setGameOver(true);
-      return;
-    }
+    if (!ready || gameOver) return;
 
     const timer = setInterval(() => {
-      setTimeLeft((t) => t - 1);
+      setTimeLeft((t) => {
+        if (t <= 1) {
+          setGameOver(true);
+          clearInterval(timer);
+          return 0;
+        }
+        return t - 1;
+      });
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft]);
+  }, [ready, gameOver]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     if (gameOver) return;
 
     if (parseInt(answer) === num1 + num2) {
-      setScore(score + 1);
+      setScore((s) => s + 1);
       newQuestion();
     } else {
       setGameOver(true);
@@ -60,54 +71,54 @@ export default function Home() {
     newQuestion();
   };
 
+  if (!ready) {
+    return (
+      <div className={styles.loading}>
+        <p>Loading MiniApp...</p>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-
-        <h1 className={styles.title}>
-          Math Quick Game
-        </h1>
-
+        <h1 className={styles.title}>Math Quick Game</h1>
         <p className={styles.subtitle}>
-          Hello {context?.user?.displayName || "Player"} 👋  
-          <br />Jawab sebanyak mungkin sebelum waktu habis!
+          Jawab sebanyak mungkin sebelum waktu habis!
         </p>
 
         {!gameOver ? (
-          <>
-            <div className={styles.gameBox}>
-              <p className={styles.timer}>⏳ Time: {timeLeft}s</p>
-              <p className={styles.score}>⭐ Score: {score}</p>
+          <div className={styles.gameBox}>
+            <p className={styles.timer}>⏳ {timeLeft}s</p>
+            <p className={styles.score}>⭐ {score}</p>
 
-              <h2 className={styles.question}>
-                {num1} + {num2} = ?
-              </h2>
+            <h2 className={styles.question}>
+              {num1} + {num2} = ?
+            </h2>
 
-              <form onSubmit={handleSubmit} className={styles.form}>
-                <input
-                  type="number"
-                  value={answer}
-                  onChange={(e) => setAnswer(e.target.value)}
-                  className={styles.input}
-                  placeholder="Your answer"
-                />
-                <button className={styles.button} type="submit">
-                  Submit
-                </button>
-              </form>
-            </div>
-          </>
+            <form onSubmit={handleSubmit} className={styles.form}>
+              <input
+                type="number"
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                className={styles.input}
+                placeholder="Jawabanmu"
+                autoFocus
+              />
+              <button className={styles.button} type="submit">
+                Submit
+              </button>
+            </form>
+          </div>
         ) : (
           <div className={styles.gameOverBox}>
             <h2 className={styles.gameOver}>GAME OVER</h2>
-            <p className={styles.finalScore}>Your Score: {score}</p>
-
+            <p className={styles.finalScore}>Score: {score}</p>
             <button className={styles.restartButton} onClick={restartGame}>
               Restart Game
             </button>
           </div>
         )}
-
       </div>
     </div>
   );
